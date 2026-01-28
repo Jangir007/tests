@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentido | Уют в каждом движении</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;800&family=Comfortaa:wght@400;700&display=swap');
+
+        :root {
+            --warm-beige: #F5F2ED;
+            --soft-brown: #6D4C41;
+            --clay: #D4A373;
+            --cream: #FEFAE0;
+        }
+
+        body {
+            background-color: var(--warm-beige);
+            color: var(--soft-brown);
+            font-family: 'Manrope', sans-serif;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="5" fill="%23D4A373"/><circle cx="14" cy="14" r="12" fill="none" stroke="%23D4A373" stroke-width="1.5" opacity="0.5"/></svg>') 14 14, auto;
+        }
+
+        h1, h2, h3, .logo-font {
+            font-family: 'Comfortaa', cursive;
+            font-weight: 700;
+        }
+
+        /* Фильтр-кнопки */
+        .filter-btn {
+            padding: 0.75rem 2rem;
+            border-radius: 100px;
+            border: 2px solid rgba(212, 163, 115, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background-color: var(--clay);
+            color: white;
+            border-color: var(--clay);
+            box-shadow: 0 10px 20px rgba(212, 163, 115, 0.2);
+            transform: scale(1.05);
+        }
+
+        .hobby-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 32px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .hobby-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hobby-card:hover {
+            transform: scale(1.03) translateY(-5px);
+            background: white;
+            box-shadow: 0 25px 50px -12px rgba(109, 76, 65, 0.1);
+        }
+
+        .btn-hobby {
+            background-color: var(--clay);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 100px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(212, 163, 115, 0.2);
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(109, 76, 65, 0.2);
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--cream);
+            padding: 2.5rem;
+            border-radius: 40px;
+            max-width: 550px;
+            width: 90%;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .blob {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: var(--clay);
+            filter: blur(120px);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.1;
+            animation: move 25s infinite alternate;
+        }
+
+        @keyframes move {
+            from { transform: translate(-20%, -20%); }
+            to { transform: translate(40%, 40%); }
+        }
+
+        .lang-btn {
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .lang-btn.active {
+            opacity: 1;
+            color: var(--clay);
+        }
+
+        .faq-item {
+            border-bottom: 1px solid rgba(109, 76, 65, 0.1);
+            padding: 1.5rem 0;
+            cursor: pointer;
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            opacity: 0.7;
+        }
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="blob"></div>
+
+    <!-- Шапка -->
+    <nav class="fixed w-full z-50 px-8 py-6 flex justify-between items-center bg-[#F5F2ED]/80 backdrop-blur-md">
+        <div class="text-3xl logo-font tracking-tight flex items-center gap-2">
+            <div class="w-8 h-8 bg-[#D4A373] rounded-full"></div>
+            Sentido
+        </div>
+        
+        <div class="hidden md:flex items-center space-x-10 font-medium">
+            <a href="#about" class="hover:text-[#D4A373] transition" data-key="nav_about">О проекте</a>
+            <a href="#collection" class="hover:text-[#D4A373] transition" data-key="nav_collection">Коллекции</a>
+            <a href="#faq" class="hover:text-[#D4A373] transition" data-key="nav_faq">Вопросы</a>
+            <a href="#contacts" class="hover:text-[#D4A373] transition" data-key="nav_contacts">Связь</a>
+            
+            <div class="flex space-x-3 border-l pl-8 border-[#D4A373]/20">
+                <span onclick="setLang('ru')" class="lang-btn active" id="btn-ru">RU</span>
+                <span onclick="setLang('en')" class="lang-btn" id="btn-en">EN</span>
+                <span onclick="setLang('es')" class="lang-btn" id="btn-es">ES</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Главный экран -->
+    <section class="min-h-screen flex flex-col justify-center items-center px-4 pt-20 text-center">
+        <div class="max-w-4xl">
+            <span class="bg-[#D4A373]/10 text-[#D4A373] px-6 py-2 rounded-full text-sm font-bold mb-6 inline-block uppercase" data-key="hero_badge">BY ALENA & JANGIR</span>
+            <h1 class="text-5xl md:text-8xl mb-8 leading-tight" data-key="hero_title">Твой дом — твое любимое <span class="italic">хобби</span>.</h1>
+            <p class="text-xl opacity-70 mb-12 max-w-2xl mx-auto" data-key="hero_desc">
+                Забудь про суету. HobbyBOB — это про мягкие текстуры, ручную работу и вещи, которые делают твой вечер теплее.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#collection" class="btn-hobby font-bold text-lg" data-key="hero_btn">Посмотреть изделия</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- О нас -->
+    <section id="about" class="py-32 px-8">
+        <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-20 items-center">
+            <div class="order-2 md:order-1">
+                <div class="hobby-card p-12 relative overflow-hidden visible">
+                    <h2 class="text-4xl mb-8" data-key="about_title">Не просто вещи</h2>
+                    <p class="text-lg leading-relaxed opacity-80 mb-6" data-key="about_p1">
+                        Мы верим, что счастье в мелочах. В HobbyBOB мы собираем то, что вдохновляет нас самих.
+                    </p>
+                    <p class="text-lg leading-relaxed opacity-80" data-key="about_p2">
+                        Никакого масс-маркета. Только то, что сделано с душой.
+                    </p>
+                </div>
+            </div>
+            <div class="text-center md:order-2">
+                <div class="inline-block p-4 bg-white rounded-[60px] shadow-2xl rotate-3">
+                    <div class="w-64 h-80 bg-gray-200 rounded-[40px] flex items-center justify-center italic text-gray-400" data-key="photo_label">
+                        <img src="img/portfolio.png" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Коллекция с фильтрами -->
+    <section id="collection" class="py-32 px-8">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="text-5xl mb-4" data-key="coll_title">Наши изделия</h2>
+            <p class="opacity-60 mb-12" data-key="coll_desc">Выберите категорию, чтобы увидеть больше</p>
+            
+            <!-- Кнопки категорий -->
+            <div class="flex flex-wrap justify-center gap-4 mb-20">
+                <button onclick="filterItems('bags')" class="filter-btn active" id="btn-bags" data-key="cat_bags">Сумки</button>
+                <button onclick="filterItems('plaids')" class="filter-btn" id="btn-plaids" data-key="cat_plaids">Пледы</button>
+                <button onclick="filterItems('earrings')" class="filter-btn" id="btn-earrings" data-key="cat_earrings">Серьги</button>
+                <button onclick="filterItems('bracelets')" class="filter-btn" id="btn-bracelets" data-key="cat_bracelets">Браслеты</button>
+            </div>
+            
+            <div id="items-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 min-h-[400px]">
+                <!-- Сюда подгружаются элементы -->
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="py-32 px-8 bg-[#FEFAE0]/30">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-4xl mb-12 text-center" data-key="faq_title">Частые вопросы</h2>
+            <div class="space-y-4" id="faq-container">
+                <!-- FAQ Content -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Контакты -->
+    <section id="contacts" class="py-32 px-8 bg-white/30 text-center">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-5xl mb-16" data-key="contact_title">Заходи в гости</h2>
+            <div class="flex flex-col md:flex-row justify-center gap-10">
+                <div class="bg-white p-6 rounded-3xl shadow-sm flex items-center gap-4 hover:scale-105 transition cursor-pointer">
+                    <i class="fab fa-instagram text-2xl text-pink-400"></i>
+                    <div class="text-left">
+                        <p class="text-xs opacity-50 font-bold uppercase">Инстаграм</p>
+                        <p class="font-bold">@hobby.bob</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-3xl shadow-sm flex items-center gap-4 hover:scale-105 transition cursor-pointer">
+                    <i class="fas fa-phone text-xl text-green-400"></i>
+                    <div class="text-left">
+                        <p class="text-xs opacity-50 font-bold uppercase">Позвони нам</p>
+                        <p class="font-bold">+7 (900) 123-45-67</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 text-center opacity-40 text-sm">
+        Sentido &copy; 2024 • <span data-key="footer_text">Проект Джангира и Алены</span>
+    </footer>
+
+    <!-- Модальное окно -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="absolute top-6 right-6 cursor-pointer text-2xl opacity-40" onclick="closeModal()">&times;</span>
+            <div id="modalContentInner"></div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+                ru: {
+                nav_about: "О проекте", nav_collection: "Коллекции", nav_contacts: "Связь", nav_faq: "Вопросы",
+                hero_badge: "ОТ АЛЕНЫ И ДЖАНГИРА",
+                hero_title: 'Твой дом — твое любимое <span class="italic">хобби</span>.',
+                hero_desc: "Забудь про суету. Sentido — это про мягкие текстуры и ручную работу.",
+                hero_btn: "Посмотреть изделия",
+                about_title: "Не просто вещи",
+                about_p1: "Мы верим, что счастье в мелочах. В HobbyBOB мы собираем то, что вдохновляет нас самих.",
+                about_p2: "Никакого масс-маркета. Только то, что сделано с душой.",
+                coll_title: "Наши изделия",
+                coll_desc: "Выберите категорию, чтобы увидеть больше",
+                cat_bags: "Сумки", cat_plaids: "Пледы", cat_earrings: "Серьги", cat_bracelets: "Браслеты",
+                btn_more: "Детали",
+                faq_title: "Частые вопросы",
+                footer_text: "Проект Джангира и Алены",
+                modal_madeof: "Сделано из:", modal_price: "Цена", modal_btn: "Хочу это!",
+                photo_label: "[Фото процесса]", contact_title: "Заходи в гости"
+            },
+            en: {
+                nav_about: "About", nav_collection: "Collections", nav_contacts: "Contact", nav_faq: "FAQ",
+                hero_badge: "BY ALENA & JANGIR",
+                hero_title: 'Your home — your favorite <span class="italic">hobby</span>.',
+                hero_desc: "Forget the rush. Sentido is about soft textures and handmade items.",
+                hero_btn: "View Items",
+                about_title: "Not just things",
+                about_p1: "We believe happiness is in the details. At HobbyBOB we collect what inspires us.",
+                about_p2: "No mass market. Only things made with soul.",
+                coll_title: "Our Creations",
+                coll_desc: "Choose a category to see more",
+                cat_bags: "Bags", cat_plaids: "Plaids", cat_earrings: "Earrings", cat_bracelets: "Bracelets",
+                btn_more: "Details",
+                faq_title: "FAQ",
+                footer_text: "Project by Jangir and Alena",
+                modal_madeof: "Made of:", modal_price: "Price", modal_btn: "I want this!",
+                photo_label: "[Process Photo]", contact_title: "Visit Us"
+            }
+        };
+
+        const itemData = {
+            bags: [
+                { id: 1, name: {ru: 'Теплые объятия', en: 'Warm Embrace'}, mat: {ru: 'Хлопковый шнур', en: 'Cotton cord'}, price: '39€', icon: 'fa-shopping-bag', image: 'img/bag-1.jpg' },
+                { id: 2, name: {ru: 'Песочный час', en: 'Sandy Hours'}, mat: {ru: 'Трикотажная пряжа', en: 'T-shirt yarn'}, price: '42€', icon: 'fa-shopping-bag', image: 'img/bag-2.jpg' },
+                { id: 3, name: {ru: 'Мини-уют', en: 'Mini Coziness'}, mat: {ru: 'Эко-материал', en: 'Eco-material'}, price: '25€', icon: 'fa-shopping-bag', image: 'img/bag-3.jpg' },
+                { id: 4, name: {ru: 'Летний бриз', en: 'Summer Breeze'}, mat: {ru: 'Натуральный лен', en: 'Natural linen'}, price: '35€', icon: 'fa-shopping-bag', image: 'img/bag-4.jpg' },
+                { id: 5, name: {ru: 'Облачный путник', en: 'Cloud Wanderer'}, mat: {ru: 'Хлопковый шнур', en: 'Cotton cord'}, price: '41€', icon: 'fa-shopping-bag', image: 'img/bag-5.jpg' },
+                { id: 6, name: {ru: 'Медовая гавань', en: 'Honey Haven'}, mat: {ru: 'Трикотажная пряжа', en: 'T-shirt yarn'}, price: '38€', icon: 'fa-shopping-bag', image: 'img/bag-6.jpg' },
+                { id: 7, name: {ru: 'Эко-мечта', en: 'Eco Dream'}, mat: {ru: 'Эко-материал', en: 'Eco-material'}, price: '32€', icon: 'fa-shopping-bag', image: 'img/bag-7.jpg' },
+                { id: 8, name: {ru: 'Волшебный клубок', en: 'Magic Ball'}, mat: {ru: 'Натуральный лен', en: 'Natural linen'}, price: '40€', icon: 'fa-shopping-bag', image: 'img/bag-8.jpg' }
+            ],
+            plaids: [
+                { id: 4, name: {ru: 'Облако', en: 'Cloud Plaid'}, mat: {ru: 'Шерсть мериноса', en: 'Merino wool'}, price: '55€', icon: 'fa-couch' },
+                { id: 5, name: {ru: 'Зефир', en: 'Marshmallow'}, mat: {ru: 'Гипоаллергенный акрил', en: 'Acrylic'}, price: '38€', icon: 'fa-couch' }
+            ],
+            earrings: [
+                { id: 6, name: {ru: 'Flora Mini', en: 'Flora Mini'}, mat: {ru: 'Серебро, сухоцветы', en: 'Silver, dried flowers'}, price: '15€', icon: 'fa-leaf' },
+                { id: 7, name: {ru: 'Drops', en: 'Drops'}, mat: {ru: 'Медицинская сталь', en: 'Medical steel'}, price: '12€', icon: 'fa-tint' }
+            ],
+            bracelets: [
+                { id: 8, name: {ru: 'Нить удачи', en: 'Luck Thread'}, mat: {ru: 'Шелковая нить, агат', en: 'Silk, agate'}, price: '8€', icon: 'fa-gem' },
+                { id: 9, name: {ru: 'Minimal', en: 'Minimal'}, mat: {ru: 'Кожа, сталь', en: 'Leather, steel'}, price: '19€', icon: 'fa-band-aid' }
+            ]
+        };
+
+        const faqs = [
+            { q: {ru: "Как заказать?", en: "How to order?"}, a: {ru: "Напишите нам в Инстаграм или позвоните.", en: "Message us on Instagram or give us a call."}},
+            { q: {ru: "Есть ли гарантия?", en: "Is there a warranty?"}, a: {ru: "Мы гарантируем качество каждого изделия ручной работы.", en: "We guarantee the quality of every handmade item."}}
+        ];
+
+        let currentLang = 'ru';
+        let currentCategory = 'bags';
+
+        function filterItems(category) {
+            currentCategory = category;
+            
+            // Смена активной кнопки
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${category}`).classList.add('active');
+            
+            const grid = document.getElementById('items-grid');
+            
+            // Анимация исчезновения старых элементов
+            const oldCards = grid.querySelectorAll('.hobby-card');
+            oldCards.forEach(c => {
+                c.style.opacity = '0';
+                c.style.transform = 'scale(0.9)';
+            });
+
+            setTimeout(() => {
+                grid.innerHTML = '';
+                const items = itemData[category];
+                
+                items.forEach((item, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'hobby-card p-8 group';
+                    const imageContent = item.image ? 
+                        `<img src="${item.image}" alt="${item.name[currentLang]}" class="w-full h-full object-cover">` :
+                        `<i class="fas ${item.icon} text-6xl text-[#D4A373]/20 group-hover:scale-110 transition duration-700"></i>`;
+                    card.innerHTML = `
+                        <div class="bg-white rounded-2xl h-64 mb-8 flex items-center justify-center overflow-hidden relative">
+                            ${imageContent}
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 italic">${item.name[currentLang]}</h3>
+                        <p class="opacity-60 mb-8">${item.mat[currentLang]}</p>
+                        <button onclick="openModal('${category}', ${item.id})" class="w-full py-4 rounded-2xl border-2 border-[#D4A373]/20 font-bold hover:bg-[#D4A373] hover:text-white transition">
+                            ${translations[currentLang].btn_more}
+                        </button>
+                    `;
+                    grid.appendChild(card);
+                    
+                    // Плавное появление новых
+                    setTimeout(() => card.classList.add('visible'), index * 100);
+                });
+            }, 300);
+        }
+
+        function openModal(cat, id) {
+            const item = itemData[cat].find(i => i.id === id);
+            const t = translations[currentLang];
+            document.getElementById('modalContentInner').innerHTML = `
+                <h2 class="text-3xl mb-4 italic text-[#D4A373]">${item.name[currentLang]}</h2>
+                <div class="mb-8 p-6 bg-white/50 rounded-2xl">
+                    <p class="text-sm font-bold opacity-40 uppercase mb-2">${t.modal_madeof}</p>
+                    <p class="text-lg italic text-[#6D4C41]">${item.mat[currentLang]}</p>
+                </div>
+                <div class="flex justify-between items-center border-t pt-6">
+                    <span class="text-2xl font-bold text-[#6D4C41]">${item.price}</span>
+                    <button class="btn-hobby py-3 px-8" onclick="location.href='#contacts'">${t.modal_btn}</button>
+                </div>
+            `;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function setLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${lang}`).classList.add('active');
+            
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (translations[lang][key]) el.innerHTML = translations[lang][key];
+            });
+            
+            renderFaq();
+            filterItems(currentCategory);
+        }
+
+        function renderFaq() {
+            const container = document.getElementById('faq-container');
+            container.innerHTML = faqs.map(f => `
+                <div class="faq-item" onclick="this.classList.toggle('active')">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-lg">${f.q[currentLang]}</span>
+                        <i class="fas fa-chevron-down text-[#D4A373]"></i>
+                    </div>
+                    <div class="faq-answer mt-4 opacity-70">${f.a[currentLang]}</div>
+                </div>
+            `).join('');
+        }
+
+        function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
+        window.onclick = function(e) { if (e.target == document.getElementById('infoModal')) closeModal(); }
+
+        window.onload = () => {
+            renderFaq();
+            filterItems('bags');
+        };
+    </script>
+</body>
+</html>
